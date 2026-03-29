@@ -18,7 +18,7 @@ services:
         dockerfile: Dockerfile
       container_name: backend
       environment:
-        DATABASE_URL: postgres://postgres:secret@postgres-dev:5432/cadastro-clientes-db?sslmode=disable
+        DATABASE_URL: postgres://postgres:secret@postgres:5432/cadastro-clientes-db?sslmode=disable
       ports:
         - "4000:4000"
       develop:
