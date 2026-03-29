@@ -1,0 +1,45 @@
+services:
+  frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      container_name: frontend
+      ports:
+        - "3000:3000"
+      develop:
+        watch:
+          - action: sync
+            path: ./frontend
+            target: /frontend
+
+  backend:
+      build:
+        context: ./backend
+        dockerfile: Dockerfile
+      container_name: backend
+      environment:
+        DATABASE_URL: postgres://postgres:secret@postgres-dev:5432/cadastro-clientes-db?sslmode=disable
+      ports:
+        - "4000:4000"
+      develop:
+        watch:
+          - action: sync
+            path: ./backend
+            target: /backend
+
+  postgres:
+      build:
+        context: ./backend/db
+        dockerfile: Dockerfile
+      container_name: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: secret
+        POSTGRES_DB: cadastro-clientes-db
+      ports:
+        - "5432:5432"
+      volumes:
+        - cadastro_clientes_data:/var/lib/postgresql/data
+
+volumes:
+  cadastro_clientes_data:
