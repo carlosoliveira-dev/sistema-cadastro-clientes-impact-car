@@ -1,8 +1,8 @@
-GET http://localhost:4000/
+GET http://localhost:4000/clientes
 
 ###
 
-GET http://localhost:4000/api/usuarios
+GET http://localhost:4000/clientes/1
 
 ###
 
