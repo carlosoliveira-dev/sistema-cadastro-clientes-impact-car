@@ -7,15 +7,12 @@ const db = pgp(connection);
 
 const port = 4000
 
-// Rotas CRUD para Clientes
 app.get('/clientes', (req, res) => {
   db.any('SELECT * FROM users')
     .then(function(data) {
-      // success;
       res.send(data);
     })
     .catch(function(error) {
-      // error;
       res.send(error)
     });
 });
@@ -24,16 +21,29 @@ app.get('/clientes/:id', (req, res) => {
   const { id } = req.params;
   db.any('SELECT * FROM users WHERE id = $1', [id])
     .then(function(data) {
-      // success;
       res.send(data);
     })
     .catch(function(error) {
-      // error;
-      res.send(error)
+      res.send('ERROR:', error);
     });
 });
 
-app.post('/clientes', (req, res) => {});
+app.post('/clientes', (req, res) => {
+  const {name, email, password } = req.body;
+  db.one('INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING id', [name, email, password])
+    .then(data => {
+      const newUser = {
+        id: data.id,
+        name: name,
+        email: email,
+        password: password
+      }
+      res.json(newUser);
+    })
+    .catch(error => {
+      res.send('ERROR:', error);
+    });
+});
 
 app.put('/clientes/:id', (req, res) => {});
 
