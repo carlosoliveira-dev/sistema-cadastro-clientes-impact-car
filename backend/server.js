@@ -45,7 +45,27 @@ app.post('/clientes', (req, res) => {
     });
 });
 
-app.put('/clientes/:id', (req, res) => {});
+app.put('/clientes/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, email } = req.body;
+  db.result('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, id])
+    .then(result => {
+      if(result.rowCount > 0){
+        res.json({
+          mensagem: 'usuário Atualizado com sucesso',
+          id: id,
+          name: name,
+          email: email
+        });
+      }
+      else{
+        res.send('ERROR: id de usuário não cadastrado');
+      }
+    })
+    .catch(error => {
+        console.log('ERROR:', error);
+    });
+});
 
 app.delete('/clientes/:id', (req, res) => {
   const { id } = req.params;
