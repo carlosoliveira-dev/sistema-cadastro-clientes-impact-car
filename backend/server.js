@@ -47,7 +47,21 @@ app.post('/clientes', (req, res) => {
 
 app.put('/clientes/:id', (req, res) => {});
 
-app.delete('/clientes/:id', (req, res) => {});
+app.delete('/clientes/:id', (req, res) => {
+  const { id } = req.params;
+  db.result('DELETE FROM users WHERE id = $1', id)
+    .then(result => {
+        if(result.rowCount > 0){
+          res.send('usuário Excluido com Sucesso');
+        }
+        else{
+          res.send('ERROR: id de usuário não cadastrado');
+        }
+    })
+    .catch(error => {
+        console.log('ERROR:', error);
+    });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
