@@ -67,7 +67,7 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block mb-2 text-foreground">
+        <label htmlFor="name" className="block mb-2" style={{ color: '#252525' }}>
           Nome *
         </label>
         <input
@@ -76,16 +76,19 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className={`w-full px-4 py-2 bg-input-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-            errors.name ? 'border-destructive' : 'border-border'
-          }`}
+          className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#f3f3f5',
+            border: errors.name ? '1px solid #d4183d' : '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#252525'
+          }}
           placeholder="Nome completo"
         />
-        {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name}</p>}
+        {errors.name && <p className="mt-1 text-sm" style={{ color: '#d4183d' }}>{errors.name}</p>}
       </div>
 
       <div>
-        <label htmlFor="email" className="block mb-2 text-foreground">
+        <label htmlFor="email" className="block mb-2" style={{ color: '#252525' }}>
           Email *
         </label>
         <input
@@ -94,16 +97,19 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className={`w-full px-4 py-2 bg-input-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-            errors.email ? 'border-destructive' : 'border-border'
-          }`}
+          className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#f3f3f5',
+            border: errors.email ? '1px solid #d4183d' : '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#252525'
+          }}
           placeholder="email@exemplo.com"
         />
-        {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
+        {errors.email && <p className="mt-1 text-sm" style={{ color: '#d4183d' }}>{errors.email}</p>}
       </div>
 
       <div>
-        <label htmlFor="phone" className="block mb-2 text-foreground">
+        <label htmlFor="phone" className="block mb-2" style={{ color: '#252525' }}>
           Telefone *
         </label>
         <input
@@ -112,16 +118,19 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          className={`w-full px-4 py-2 bg-input-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-            errors.phone ? 'border-destructive' : 'border-border'
-          }`}
+          className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#f3f3f5',
+            border: errors.phone ? '1px solid #d4183d' : '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#252525'
+          }}
           placeholder="(00) 00000-0000"
         />
-        {errors.phone && <p className="mt-1 text-sm text-destructive">{errors.phone}</p>}
+        {errors.phone && <p className="mt-1 text-sm" style={{ color: '#d4183d' }}>{errors.phone}</p>}
       </div>
 
       <div>
-        <label htmlFor="address" className="block mb-2 text-foreground">
+        <label htmlFor="address" className="block mb-2" style={{ color: '#252525' }}>
           Endereço
         </label>
         <textarea
@@ -130,7 +139,12 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
           value={formData.address}
           onChange={handleChange}
           rows={3}
-          className="w-full px-4 py-2 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 resize-none"
+          style={{
+            backgroundColor: '#f3f3f5',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#252525'
+          }}
           placeholder="Endereço completo"
         />
       </div>
@@ -138,8 +152,8 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
       <div className="flex gap-3 pt-4">
         <button
           type="submit"
-          className="flex-1 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-          // style={{background: "blue"}}
+          className="flex-1 px-6 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: '#030213', color: '#ffffff' }}
         >
           {customer ? 'Atualizar' : 'Cadastrar'}
         </button>
@@ -147,7 +161,8 @@ export function CustomerForm({ customer, onSubmit, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-6 py-2.5 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
+            className="flex-1 px-6 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: '#f2f2f5', color: '#030213' }}
           >
             Cancelar
           </button>

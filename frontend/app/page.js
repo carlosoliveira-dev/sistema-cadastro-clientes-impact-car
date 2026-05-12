@@ -69,12 +69,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-primary text-primary-foreground shadow-lg">
+    <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
+      <div className="shadow-lg" style={{ backgroundColor: '#030213', color: '#ffffff' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="bg-primary-foreground/10 p-3 rounded-lg">
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -98,7 +98,8 @@ export default function App() {
             </div>
             <button
               onClick={() => setViewMode('prototypes')}
-              className="px-4 py-2 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg transition-colors text-sm flex items-center gap-2"
+              className="px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-2 hover:opacity-80"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
             >
               <svg
                 className="w-5 h-5"
@@ -122,13 +123,14 @@ export default function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-lg p-6 sticky top-8">
+            <div className="rounded-lg p-6 sticky top-8" style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
               <div className="flex items-center justify-between mb-6">
                 <h2>{editingCustomer ? 'Editar Cliente' : 'Novo Cliente'}</h2>
                 {!showForm && (
                   <button
                     onClick={() => setShowForm(true)}
-                    className="lg:hidden px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                    className="lg:hidden px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ backgroundColor: '#030213', color: '#ffffff' }}
                   >
                     Adicionar
                   </button>
@@ -150,7 +152,7 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h2>Clientes Cadastrados</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#717182' }}>
                     Total: {filteredCustomers.length} {filteredCustomers.length === 1 ? 'cliente' : 'clientes'}
                   </p>
                 </div>
@@ -161,13 +163,19 @@ export default function App() {
                     placeholder="Buscar clientes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: '#f3f3f5',
+                      border: '1px solid rgba(0, 0, 0, 0.1)',
+                      color: '#252525'
+                    }}
                   />
                   <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: '#717182' }}
                   >
                     <path
                       strokeLinecap="round"

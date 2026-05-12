@@ -7,15 +7,16 @@ export function PrototypeViewer({ onBack }) {
   const [activeView, setActiveView] = useState('mobile');
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
+      <div className="shadow-lg sticky top-0 z-50" style={{ backgroundColor: '#030213', color: '#ffffff' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {onBack && (
                 <button
                   onClick={onBack}
-                  className="px-4 py-2 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg transition-colors flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg transition-colors flex items-center gap-2 hover:opacity-80"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                 >
                   <svg
                     className="w-5 h-5"
@@ -35,34 +36,37 @@ export function PrototypeViewer({ onBack }) {
               )}
               <h1 className="text-xl sm:text-2xl">Protótipos Visuais - Sistema de Cadastro</h1>
             </div>
-            <div className="flex gap-2 bg-primary-foreground/10 p-1 rounded-lg">
+            <div className="flex gap-2 p-1 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
               <button
                 onClick={() => setActiveView('mobile')}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className="px-4 py-2 rounded-md transition-colors"
+                style={
                   activeView === 'mobile'
-                    ? 'bg-primary-foreground text-primary'
-                    : 'hover:bg-primary-foreground/20'
-                }`}
+                    ? { backgroundColor: '#ffffff', color: '#030213' }
+                    : { backgroundColor: 'transparent' }
+                }
               >
                 Mobile
               </button>
               <button
                 onClick={() => setActiveView('tablet')}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className="px-4 py-2 rounded-md transition-colors"
+                style={
                   activeView === 'tablet'
-                    ? 'bg-primary-foreground text-primary'
-                    : 'hover:bg-primary-foreground/20'
-                }`}
+                    ? { backgroundColor: '#ffffff', color: '#030213' }
+                    : { backgroundColor: 'transparent' }
+                }
               >
                 Tablet
               </button>
               <button
                 onClick={() => setActiveView('desktop')}
-                className={`px-4 py-2 rounded-md transition-colors ${
+                className="px-4 py-2 rounded-md transition-colors"
+                style={
                   activeView === 'desktop'
-                    ? 'bg-primary-foreground text-primary'
-                    : 'hover:bg-primary-foreground/20'
-                }`}
+                    ? { backgroundColor: '#ffffff', color: '#030213' }
+                    : { backgroundColor: 'transparent' }
+                }
               >
                 Desktop
               </button>
