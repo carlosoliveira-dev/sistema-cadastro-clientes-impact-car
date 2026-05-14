@@ -7,6 +7,10 @@ const db = pgp(connection);
 
 const port = 4000
 
+app.get('/', (req, res) => {
+  res.send('oi');
+});
+
 app.get('/clientes', (req, res) => {
   db.any('SELECT * FROM users')
     .then(function(data) {
@@ -86,3 +90,5 @@ app.delete('/clientes/:id', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+module.exports = app;
