@@ -1,15 +1,12 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
 app.use(express.json());
 const pgp = require('pg-promise')();
-const connection = 'postgres://postgres:secret@postgres:5432/cadastro-clientes-db?sslmode=disable'
+const connection = process.env.DATABASE_URL
 const db = pgp(connection);
 
 const port = 4000
-
-app.get('/', (req, res) => {
-  res.send('oi');
-});
 
 app.get('/clientes', (req, res) => {
   db.any('SELECT * FROM users')

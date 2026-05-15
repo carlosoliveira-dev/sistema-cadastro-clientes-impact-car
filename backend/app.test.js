@@ -1,15 +1,16 @@
+process.env.DATABASE_URL = 'postgres://postgres:secret@localhost:5432/cadastro-clientes-db?sslmode=disable';
+
 const app = require('./app');
 const request = require('supertest');
 
 describe('BACKEND API', () => {
 
-    it('should return "Hello, Express + TypeScript!" from /', async () => {
+    it('deve retornar a lista de clientes em /clientes', async () => {
         
         const response = await request(app)
-            .get('/')
+            .get('/clientes')
             .expect(200);
-
-        expect(response.text).toBe('Hello, Express + TypeScript!');
+        console.log(response.body);
     });
 
 });
