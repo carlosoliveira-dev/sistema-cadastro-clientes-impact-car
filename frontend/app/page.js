@@ -2,10 +2,8 @@
 import { useState, useEffect } from 'react';
 import { CustomerForm } from './components/CustomerForm';
 import { CustomerList } from './components/CustomerList';
-import { PrototypeViewer } from './components/PrototypeViewer';
 
 export default function App() {
-  const [viewMode, setViewMode] = useState('app');
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,10 +62,6 @@ export default function App() {
     customer.phone.includes(searchTerm)
   );
 
-  if (viewMode === 'prototypes') {
-    return <PrototypeViewer onBack={() => setViewMode('app')} />;
-  }
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
       <div className="shadow-lg" style={{ backgroundColor: '#030213', color: '#ffffff' }}>
@@ -96,26 +90,6 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setViewMode('prototypes')}
-              className="px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-2 hover:opacity-80"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
-                />
-              </svg>
-              Ver Protótipos
-            </button>
           </div>
         </div>
       </div>
