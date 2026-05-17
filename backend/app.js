@@ -37,14 +37,15 @@ app.get('/clientes/:id', (req, res) => {
 });
 
 app.post('/clientes', (req, res) => {
-  const {name, email, password } = req.body;
-  db.one('INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING id', [name, email, password])
+  const {name, email, phone, address } = req.body;
+  db.one('INSERT INTO users(name, email, phone, address) VALUES($1, $2, $3, $4) RETURNING id', [name, email, phone, address])
     .then(data => {
       const newUser = {
         id: data.id,
         name: name,
         email: email,
-        password: password
+        phone: phone,
+        address: address
       }
       // Retorna o status 201 (Created) que é o padrão ideal para criação de registros
       res.status(201).json(newUser);
@@ -52,7 +53,7 @@ app.post('/clientes', (req, res) => {
     .catch(error => {
       // Registra o erro no terminal do seu backend
       console.error("Erro ao inserir usuário no banco:", error);
-      
+
       // Retorna o status 400 (Bad Request) ou 500 se for erro do banco
       res.status(400).json({
         error: "Erro ao cadastrar o cliente.",
