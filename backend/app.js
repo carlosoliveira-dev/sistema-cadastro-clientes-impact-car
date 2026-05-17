@@ -64,15 +64,16 @@ app.post('/clientes', (req, res) => {
 
 app.put('/clientes/:id', (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
-  db.result('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, id])
+  const { name, email, phone, address } = req.body;
+  db.result('UPDATE users SET name = $1, email = $2, phone = $3, address = $4 WHERE id = $5', [name, email, phone, address, id])
     .then(result => {
       if(result.rowCount > 0){
         res.json({
           mensagem: 'usuário Atualizado com sucesso',
           id: id,
           name: name,
-          email: email
+          phone: phone,
+          address: address
         });
       }
       else{
