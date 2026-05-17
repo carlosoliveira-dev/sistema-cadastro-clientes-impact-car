@@ -3,109 +3,47 @@ import { useState, useEffect } from 'react';
 import { CustomerForm } from './components/CustomerForm';
 import { CustomerList } from './components/CustomerList';
 
-// Altere para a URL real do seu backend (ex: 'http://localhost:3001/api/customers')
-const API_URL = 'http://localhost:4000/clientes';
-
 export default function App() {
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
-  
-  // Estados para lidar com requisições assíncronas
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // GET: Buscar clientes do backend ao carregar a página
   useEffect(() => {
-    const fetchCustomers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Erro ao buscar clientes.');
-        const data = await response.json();
-        setCustomers(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCustomers();
-  }, []);
-
-  // POST: Adicionar cliente no backend
-  const handleAddCustomer = async (customerData) => {
-    setError(null);
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customerData), // O id geralmente é gerado pelo próprio backend
-      });
-
-      if (!response.ok) throw new Error('Erro ao salvar o cliente.');
-      
-      const newCustomer = await response.json();
-      
-      // Atualiza o estado local com o objeto retornado pelo banco de dados
-      setCustomers(prev => [newCustomer, ...prev]);
-      setShowForm(false);
-    } catch (err) {
-      setError(err.message);
+    const savedCustomers = localStorage.getItem('customers');
+    if (savedCustomers) {
+      setCustomers(JSON.parse(savedCustomers));
     }
+  }, []); // devolve um array vazio por padrão
+
+  useEffect(() => {
+    localStorage.setItem('customers', JSON.stringify(customers));
+  }, [customers]);
+
+  const handleAddCustomer = (customerData) => {
+    const newCustomer = {
+      ...customerData,
+      id: Date.now().toString(),
+    };
+    setCustomers(prev => [newCustomer, ...prev]);
+    setShowForm(false);
   };
 
-  // PUT: Atualizar cliente no backend
-  const handleUpdateCustomer = async (customerData) => {
-    if (!editingCustomer) return;
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/${editingCustomer.id}`, {
-        method: 'PUT', // ou 'PATCH', dependendo da sua API
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customerData),
-      });
-
-      if (!response.ok) throw new Error('Erro ao atualizar o cliente.');
-
-      const updatedCustomer = await response.json();
-
+  const handleUpdateCustomer = (customerData) => {
+    if (editingCustomer) {
       setCustomers(prev =>
         prev.map(customer =>
-          customer.id === editingCustomer.id ? updatedCustomer : customer
+          customer.id === editingCustomer.id
+            ? { ...customerData, id: customer.id }
+            : customer
         )
       );
       setEditingCustomer(null);
-      setShowForm(false);
-    } catch (err) {
-      setError(err.message);
     }
   };
 
-  // DELETE: Remover cliente do backend
-  const handleDeleteCustomer = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Erro ao excluir o cliente.');
-
-      setCustomers(prev => prev.filter(customer => customer.id !== id));
-    } catch (err) {
-      setError(err.message);
-    }
+  const handleDeleteCustomer = (id) => {
+    setCustomers(prev => prev.filter(customer => customer.id !== id));
   };
 
   const handleEditCustomer = (customer) => {
@@ -119,9 +57,9 @@ export default function App() {
   };
 
   const filteredCustomers = customers.filter(customer =>
-    customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone?.includes(searchTerm)
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.phone.includes(searchTerm)
   );
 
   return (
@@ -157,13 +95,6 @@ export default function App() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Banner de Feedback de Erro */}
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-700 border border-red-200">
-            ⚠️ {error}
-          </div>
-        )}
-
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="rounded-lg p-6 sticky top-8" style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
@@ -231,18 +162,11 @@ export default function App() {
               </div>
             </div>
 
-            {/* Renderização condicional para o estado de Loading */}
-            {loading ? (
-              <div className="text-center py-12 text-gray-500">
-                Carregando clientes...
-              </div>
-            ) : (
-              <CustomerList
-                customers={filteredCustomers}
-                onEdit={handleEditCustomer}
-                onDelete={handleDeleteCustomer}
-              />
-            )}
+            <CustomerList
+              customers={filteredCustomers}
+              onEdit={handleEditCustomer}
+              onDelete={handleDeleteCustomer}
+            />
           </div>
         </div>
       </div>

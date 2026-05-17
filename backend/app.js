@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express')
+const cors = require('cors');
 const app = express()
+app.use(cors());
 app.use(express.json());
 const pgp = require('pg-promise')();
 const connection = process.env.DATABASE_URL
@@ -11,10 +13,15 @@ const port = 4000
 app.get('/clientes', (req, res) => {
   db.any('SELECT * FROM users')
     .then(function(data) {
-      res.send(data);
+      // Retorna o status 200 (OK) e os dados explicitamente em formato JSON
+      res.status(200).json(data);
     })
     .catch(function(error) {
-      res.send(error)
+      // Retorna o status 500 (Erro Interno do Servidor) e um objeto JSON estruturado
+      res.status(500).json({ 
+        error: "Erro interno no servidor ao buscar clientes.",
+        details: error.message || error 
+      });
     });
 });
 
@@ -39,10 +46,18 @@ app.post('/clientes', (req, res) => {
         email: email,
         password: password
       }
-      res.json(newUser);
+      // Retorna o status 201 (Created) que é o padrão ideal para criação de registros
+      res.status(201).json(newUser);
     })
     .catch(error => {
-      res.send('ERROR:', error);
+      // Registra o erro no terminal do seu backend
+      console.error("Erro ao inserir usuário no banco:", error);
+      
+      // Retorna o status 400 (Bad Request) ou 500 se for erro do banco
+      res.status(400).json({
+        error: "Erro ao cadastrar o cliente.",
+        details: error.message || error
+      });
     });
 });
 
