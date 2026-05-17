@@ -72,6 +72,7 @@ app.put('/clientes/:id', (req, res) => {
           mensagem: 'usuário Atualizado com sucesso',
           id: id,
           name: name,
+          email: email,
           phone: phone,
           address: address
         });
