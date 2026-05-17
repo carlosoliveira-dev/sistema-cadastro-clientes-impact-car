@@ -1,6 +1,7 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+const authMiddleware = require('./authMiddleware')
 const express = require('express')
 const cors = require('cors');
 const app = express()
@@ -13,6 +14,9 @@ const db = pgp(connection);
 
 const port = 4000
 
+/*
+  devolve a lista de contas de usuários
+*/
 app.get('/usuarios', (req, res) => {
   db.any('SELECT * FROM users')
     .then(function(data) {
@@ -28,26 +32,19 @@ app.get('/usuarios', (req, res) => {
     });
 });
 
-app.get('/usuarios/:id', (req, res) => {
-  const { id } = req.params;
-  db.any('SELECT * FROM users WHERE id = $1', [id])
-    .then(function(data) {
-      res.send(data);
-    })
-    .catch(function(error) {
-      res.send('ERROR:', error);
-    });
-});
+/*
 
-app.get('/clientes/:id', (req, res) => {
-  const { id } = req.params;
-  db.any('SELECT * FROM users WHERE id = $1', [id])
-    .then(function(data) {
-      res.send(data);
-    })
-    .catch(function(error) {
-      res.send('ERROR:', error);
-    });
+*/
+app.get('/clientes',authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const clientes = await db.any('SELECT * FROM customers WHERE user_id = $1', [userId]);
+
+    res.status(200).json(clientes);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar clientes." });
+  }
+
 });
 
 app.post('/usuarios', (req, res) => {
@@ -113,6 +110,10 @@ app.post('/register', async (req, res) => {
     });
   }
 });
+
+/*
+  rota responsável por gerar o token jwt
+*/
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;

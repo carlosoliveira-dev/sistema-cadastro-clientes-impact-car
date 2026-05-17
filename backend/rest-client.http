@@ -1,11 +1,9 @@
 ### devolve a lista de contas de usuários
 GET http://localhost:4000/usuarios
 
-### devolve os cliente cadastrados pelo id da conta
-GET http://localhost:4000/clientes/1
-
-### devolve uma conta de usuário pelo id
-GET http://localhost:4000/usuarios/1
+### Buscar os clientes cadastrados (Logado)
+GET http://localhost:4000/clientes
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzc5MDI4NjUzLCJleHAiOjE3NzkwNTc0NTN9.GQCzE_tm7xtp17qLF4NC6rGH9dRDlMk9F-fvamAtPpA
 
 ### cadastra uma nova conta de usuário
 POST http://localhost:4000/register HTTP/1.1
@@ -36,4 +34,4 @@ Content-Type: application/json
 }
 
 ### deleta uma conta de usuário pelo id
-DELETE http://localhost:4000/clientes/1
+DELETE http://localhost:4000/usuarios/1
