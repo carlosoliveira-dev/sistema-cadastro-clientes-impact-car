@@ -5,6 +5,9 @@ GET http://localhost:4000/users
 GET http://localhost:4000/customers
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJpYXQiOjE3NzkxMDM0MTQsImV4cCI6MTc3OTEzMjIxNH0.BM85Z6vmt6TUBHmrun0JULM1uXa3hSKzeFLQvfZxD9s
 
+### deleta um customer pelo id
+DELETE http://localhost:4000/customers/18
+
 ### cadastra uma nova conta de usuário
 POST http://localhost:4000/signup HTTP/1.1
 content-type: application/json

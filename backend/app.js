@@ -208,7 +208,37 @@ app.put('/customers/:id', (req, res) => {
     });
 });
 
+/* apaga um cliente na base de dados */
+app.delete('/customers/:id', authMiddleware, async (req, res) => {
+  const customerId = req.params.id;
+  const userId = req.userId; 
 
+  try {
+    const result = await db.result(
+      'DELETE FROM customers WHERE id = $1 AND user_id = $2', 
+      [customerId, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ 
+        error: "Cliente não encontrado ou você não tem permissão para excluí-lo." 
+      });
+    }
+
+    res.status(200).json({ 
+      message: "Cliente excluído com sucesso.",
+      deletedId: customerId
+    });
+
+  } catch (error) {
+    console.error("Erro ao deletar cliente no banco:", error);
+
+    res.status(500).json({
+      error: "Erro interno ao tentar excluir o cliente.",
+      details: error.message || error
+    });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

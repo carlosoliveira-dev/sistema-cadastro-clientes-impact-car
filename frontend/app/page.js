@@ -106,8 +106,34 @@ useEffect(() => {
     }
   };
 
-  const handleDeleteCustomer = (id) => {
-    setCustomers(prev => prev.filter(customer => customer.id !== id));
+  const handleDeleteCustomer = async (id) => {
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+    setError(null);
+
+    try {
+      // Obtém o token do objeto user (contexto) ou do localStorage como fallback
+      const token = user?.token || localStorage.getItem('token');
+
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Se o backend retornar erro (como 401 ou 404), cai no catch
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao excluir o cliente.');
+      }
+
+      // Só remove da tela (estado local) se o backend confirmou a exclusão
+      setCustomers(prev => prev.filter(customer => customer.id !== id));
+      
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleEditCustomer = (customer) => {
