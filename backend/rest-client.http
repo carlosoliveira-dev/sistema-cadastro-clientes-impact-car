@@ -3,7 +3,7 @@ GET http://localhost:4000/users
 
 ### Buscar os clientes cadastrados (Logado)
 GET http://localhost:4000/customers
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzc5MDk1NDk5LCJleHAiOjE3NzkxMjQyOTl9.ingLmWsbw8nBiBRYi4oaGRy4vq6vrFzd-uwCoB2T1T0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJpYXQiOjE3NzkxMDM0MTQsImV4cCI6MTc3OTEzMjIxNH0.BM85Z6vmt6TUBHmrun0JULM1uXa3hSKzeFLQvfZxD9s
 
 ### cadastra uma nova conta de usuário
 POST http://localhost:4000/signup HTTP/1.1
@@ -15,13 +15,25 @@ content-type: application/json
     "password": "password"
 }
 
+### cadastra um novo cliente na conta
+POST http://localhost:4000/customers HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJpYXQiOjE3NzkxMDM3ODIsImV4cCI6MTc3OTEzMjU4Mn0.fGJAfjJu2c8vOMPuqa0Nb1xxxfCUH7ZDgfFt7mv41KM
+content-type: application/json
+
+{
+    "name": "user",
+    "email": "user@gmail.com",
+    "phone": "phone",
+    "address": "address"
+}
+
 ### login
 POST http://localhost:4000/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "user@gmail.com",
-    "password": "password"
+    "email": "carlos.oliveira.dev.junior@gmail.com",
+    "password": "123456"
 }
 
 ### ainda não configurado aqui
@@ -34,4 +46,4 @@ Content-Type: application/json
 }
 
 ### deleta uma conta de usuário pelo id
-DELETE http://localhost:4000/usuarios/1
+DELETE http://localhost:4000/users/2

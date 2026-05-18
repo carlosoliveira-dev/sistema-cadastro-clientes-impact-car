@@ -113,7 +113,7 @@ app.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id }, 
+      { user_id: user.id }, 
       jwt_secret,   
       { expiresIn: '8h' }
     );
@@ -122,7 +122,7 @@ app.post('/login', async (req, res) => {
       message: "Login realizado com sucesso!",
       token: token,
       user: {
-        id: user.id,
+        user_id: user.id,
         name: user.name,
         email: user.email,
         created_at: user.created_at
@@ -156,11 +156,12 @@ app.get('/customers',authMiddleware, async (req, res) => {
 });
 
 /* realiza o cadastro de um novo cliente na conta de usuário*/
-app.post('/customers', (req, res) => {
+app.post('/customers',authMiddleware, async (req, res) => {
   const {name, email, phone, address } = req.body;
-  db.one('INSERT INTO users(name, email, phone, address) VALUES($1, $2, $3, $4) RETURNING id', [name, email, phone, address])
+  db.one('INSERT INTO customers(user_id, name, email, phone, address) VALUES($1, $2, $3, $4, $5) RETURNING id', [req.userId, name, email, phone, address])
     .then(data => {
       const newUser = {
+        user_id: req.userId,
         id: data.id,
         name: name,
         email: email,
