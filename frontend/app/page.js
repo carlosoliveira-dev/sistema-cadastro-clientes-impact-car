@@ -6,21 +6,45 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthPage } from './components/AuthPage';
 
 function AppContent() {
-  const { user, logout, loading } = useAuth();
+  const { user, logout} = useAuth();
   const [viewMode, setViewMode] = useState('app');
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      const savedCustomers = localStorage.getItem('customers');
-      if (savedCustomers) {
-        setCustomers(JSON.parse(savedCustomers));
+const API_URL = 'http://localhost:4000/customers';
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+useEffect(() => {
+  if (user) {
+    const fetchCustomers = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            // Envia o token salvo no login para o backend autenticar a rota
+            'Authorization': `Bearer ${user.token || localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Erro ao buscar clientes.');
+        const data = await response.json();
+        setCustomers(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [user]);
+    };
+
+    fetchCustomers();
+  }
+}, [user]);
 
   useEffect(() => {
     if (user) {
@@ -34,6 +58,23 @@ function AppContent() {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4" style={{ borderColor: '#f3f3f5', borderTopColor: '#030213' }}></div>
           <p className="mt-4" style={{ color: '#717182' }}>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center text-red-600">
+          <p className="font-bold">Ocorreu um erro:</p>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-black text-white rounded-lg text-sm"
+          >
+            Tentar Novamente
+          </button>
         </div>
       </div>
     );
