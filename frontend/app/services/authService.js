@@ -30,7 +30,7 @@ export const authService = {
 
   async register(email, password, name) {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch(`${API_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
