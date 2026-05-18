@@ -14,10 +14,8 @@ const db = pgp(connection);
 
 const port = 4000
 
-/*
-  devolve a lista de contas de usuários
-*/
-app.get('/usuarios', (req, res) => {
+/* retorna a lista de contas de usuários */
+app.get('/users', (req, res) => {
   db.any('SELECT * FROM users')
     .then(function(data) {
       // Retorna o status 200 (OK) e os dados explicitamente em formato JSON
@@ -32,48 +30,29 @@ app.get('/usuarios', (req, res) => {
     });
 });
 
-/*
-
-*/
-app.get('/clientes',authMiddleware, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const clientes = await db.any('SELECT * FROM customers WHERE user_id = $1', [userId]);
-
-    res.status(200).json(clientes);
-  } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar clientes." });
-  }
-
-});
-
-app.post('/usuarios', (req, res) => {
-  const {name, email, phone, address } = req.body;
-  db.one('INSERT INTO users(name, email, phone, address) VALUES($1, $2, $3, $4) RETURNING id', [name, email, phone, address])
-    .then(data => {
-      const newUser = {
-        id: data.id,
-        name: name,
-        email: email,
-        phone: phone,
-        address: address
-      }
-      // Retorna o status 201 (Created) que é o padrão ideal para criação de registros
-      res.status(201).json(newUser);
+/* rota responsável por apagar uma conta de usuário */
+app.delete('/users/:id', (req, res) => {
+  const { id } = req.params;
+  db.result('DELETE FROM users WHERE id = $1', id)
+    .then(result => {
+        if(result.rowCount > 0){
+          res.send('usuário Excluido com Sucesso');
+        }
+        else{
+          res.send('ERROR: id de usuário não cadastrado');
+        }
     })
     .catch(error => {
-      // Registra o erro no terminal do seu backend
-      console.error("Erro ao inserir usuário no banco:", error);
-
-      // Retorna o status 400 (Bad Request) ou 500 se for erro do banco
-      res.status(400).json({
-        error: "Erro ao cadastrar o cliente.",
-        details: error.message || error
-      });
+        console.log('ERROR:', error);
     });
 });
 
-app.post('/register', async (req, res) => {
+
+
+/* autenticação do usuário */
+
+/* cria uma nova conta de usuário */
+app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
 
   // 1. Validação básica de entrada
@@ -111,10 +90,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-/*
-  rota responsável por gerar o token jwt
-*/
-
+/* login e geração do token jwt */
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -162,7 +138,52 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.put('/usuarios/:id', (req, res) => {
+
+
+/* rotas responsáveis pelo cadastro de clientes no app */
+
+/* retorna a lista de clientes cadastrados em um usuário */
+app.get('/customers',authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const clientes = await db.any('SELECT * FROM customers WHERE user_id = $1', [userId]);
+
+    res.status(200).json(clientes);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar clientes." });
+  }
+
+});
+
+/* realiza o cadastro de um novo cliente na conta de usuário*/
+app.post('/customers', (req, res) => {
+  const {name, email, phone, address } = req.body;
+  db.one('INSERT INTO users(name, email, phone, address) VALUES($1, $2, $3, $4) RETURNING id', [name, email, phone, address])
+    .then(data => {
+      const newUser = {
+        id: data.id,
+        name: name,
+        email: email,
+        phone: phone,
+        address: address
+      }
+      // Retorna o status 201 (Created) que é o padrão ideal para criação de registros
+      res.status(201).json(newUser);
+    })
+    .catch(error => {
+      // Registra o erro no terminal do seu backend
+      console.error("Erro ao inserir usuário no banco:", error);
+
+      // Retorna o status 400 (Bad Request) ou 500 se for erro do banco
+      res.status(400).json({
+        error: "Erro ao cadastrar o cliente.",
+        details: error.message || error
+      });
+    });
+});
+
+/* atualiza um cliente na base de dados */
+app.put('/customers/:id', (req, res) => {
   const { id } = req.params;
   const { name, email, phone, address } = req.body;
   db.result('UPDATE users SET name = $1, email = $2, phone = $3, address = $4 WHERE id = $5', [name, email, phone, address, id])
@@ -186,21 +207,7 @@ app.put('/usuarios/:id', (req, res) => {
     });
 });
 
-app.delete('/usuarios/:id', (req, res) => {
-  const { id } = req.params;
-  db.result('DELETE FROM users WHERE id = $1', id)
-    .then(result => {
-        if(result.rowCount > 0){
-          res.send('usuário Excluido com Sucesso');
-        }
-        else{
-          res.send('ERROR: id de usuário não cadastrado');
-        }
-    })
-    .catch(error => {
-        console.log('ERROR:', error);
-    });
-});
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
