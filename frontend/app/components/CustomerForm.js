@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from 'react';
 
 export function CustomerForm({ customer, onSubmit, onCancel }) {

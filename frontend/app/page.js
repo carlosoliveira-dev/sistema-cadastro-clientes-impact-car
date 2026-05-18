@@ -2,110 +2,71 @@
 import { useState, useEffect } from 'react';
 import { CustomerForm } from './components/CustomerForm';
 import { CustomerList } from './components/CustomerList';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthPage } from './components/AuthPage';
 
-// Altere para a URL real do seu backend (ex: 'http://localhost:3001/api/customers')
-const API_URL = 'http://localhost:4000/clientes';
-
-export default function App() {
+function AppContent() {
+  const { user, logout, loading } = useAuth();
+  const [viewMode, setViewMode] = useState('app');
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
-  
-  // Estados para lidar com requisições assíncronas
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  // GET: Buscar clientes do backend ao carregar a página
   useEffect(() => {
-    const fetchCustomers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Erro ao buscar clientes.');
-        const data = await response.json();
-        setCustomers(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+    if (user) {
+      const savedCustomers = localStorage.getItem('customers');
+      if (savedCustomers) {
+        setCustomers(JSON.parse(savedCustomers));
       }
-    };
-
-    fetchCustomers();
-  }, []);
-
-  // POST: Adicionar cliente no backend
-  const handleAddCustomer = async (customerData) => {
-    setError(null);
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customerData), // O id geralmente é gerado pelo próprio backend
-      });
-
-      if (!response.ok) throw new Error('Erro ao salvar o cliente.');
-      
-      const newCustomer = await response.json();
-      
-      // Atualiza o estado local com o objeto retornado pelo banco de dados
-      setCustomers(prev => [newCustomer, ...prev]);
-      setShowForm(false);
-    } catch (err) {
-      setError(err.message);
     }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('customers', JSON.stringify(customers));
+    }
+  }, [customers, user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#ffffff' }}>
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4" style={{ borderColor: '#f3f3f5', borderTopColor: '#030213' }}></div>
+          <p className="mt-4" style={{ color: '#717182' }}>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
+
+  const handleAddCustomer = (customerData) => {
+    const newCustomer = {
+      ...customerData,
+      id: Date.now().toString(),
+    };
+    setCustomers(prev => [newCustomer, ...prev]);
+    setShowForm(false);
   };
 
-  // PUT: Atualizar cliente no backend
-  const handleUpdateCustomer = async (customerData) => {
-    if (!editingCustomer) return;
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/${editingCustomer.id}`, {
-        method: 'PUT', // ou 'PATCH', dependendo da sua API
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customerData),
-      });
-
-      if (!response.ok) throw new Error('Erro ao atualizar o cliente.');
-
-      const updatedCustomer = await response.json();
-
+  const handleUpdateCustomer = (customerData) => {
+    if (editingCustomer) {
       setCustomers(prev =>
         prev.map(customer =>
-          customer.id === editingCustomer.id ? updatedCustomer : customer
+          customer.id === editingCustomer.id
+            ? { ...customerData, id: customer.id }
+            : customer
         )
       );
       setEditingCustomer(null);
-      setShowForm(false);
-    } catch (err) {
-      setError(err.message);
     }
   };
 
-  // DELETE: Remover cliente do backend
-  const handleDeleteCustomer = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Erro ao excluir o cliente.');
-
-      setCustomers(prev => prev.filter(customer => customer.id !== id));
-    } catch (err) {
-      setError(err.message);
-    }
+  const handleDeleteCustomer = (id) => {
+    setCustomers(prev => prev.filter(customer => customer.id !== id));
   };
 
   const handleEditCustomer = (customer) => {
@@ -119,10 +80,14 @@ export default function App() {
   };
 
   const filteredCustomers = customers.filter(customer =>
-    customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone?.includes(searchTerm)
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.phone.includes(searchTerm)
   );
+
+  if (viewMode === 'prototypes') {
+    return <PrototypeViewer onBack={() => setViewMode('app')} />;
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
@@ -148,22 +113,57 @@ export default function App() {
               <div>
                 <h1>Sistema de Cadastro</h1>
                 <p className="text-sm opacity-90 mt-0.5">
-                  Gerencie seus clientes de forma simples e eficiente
+                  Bem-vindo, {user?.name || user?.email}
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setViewMode('prototypes')}
+                className="px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-2 hover:opacity-80"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                />
+              </svg>
+              Ver Protótipos
+            </button>
+            <button
+              onClick={logout}
+              className="px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-2 hover:opacity-80"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              Sair
+            </button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Banner de Feedback de Erro */}
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-100 text-red-700 border border-red-200">
-            ⚠️ {error}
-          </div>
-        )}
-
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="rounded-lg p-6 sticky top-8" style={{ backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)' }}>
@@ -231,21 +231,22 @@ export default function App() {
               </div>
             </div>
 
-            {/* Renderização condicional para o estado de Loading */}
-            {loading ? (
-              <div className="text-center py-12 text-gray-500">
-                Carregando clientes...
-              </div>
-            ) : (
-              <CustomerList
-                customers={filteredCustomers}
-                onEdit={handleEditCustomer}
-                onDelete={handleDeleteCustomer}
-              />
-            )}
+            <CustomerList
+              customers={filteredCustomers}
+              onEdit={handleEditCustomer}
+              onDelete={handleDeleteCustomer}
+            />
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
