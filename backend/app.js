@@ -184,27 +184,33 @@ app.post('/customers',authMiddleware, async (req, res) => {
 });
 
 /* atualiza um cliente na base de dados */
-app.put('/customers/:id', (req, res) => {
+app.put('/customers/:id', authMiddleware, (req, res) => {
   const { id } = req.params;
   const { name, email, phone, address } = req.body;
-  db.result('UPDATE users SET name = $1, email = $2, phone = $3, address = $4 WHERE id = $5', [name, email, phone, address, id])
+  const userId = req.userId;
+
+  db.result(
+    'UPDATE customers SET name = $1, email = $2, phone = $3, address = $4 WHERE id = $5 AND user_id = $6', 
+    [name, email, phone, address, id, userId]
+  )
     .then(result => {
-      if(result.rowCount > 0){
+      if (result.rowCount > 0) {
         res.json({
-          mensagem: 'usuário Atualizado com sucesso',
+          mensagem: 'Cliente atualizado com sucesso',
+          user_id: userId,
           id: id,
           name: name,
           email: email,
           phone: phone,
           address: address
         });
-      }
-      else{
-        res.send('ERROR: id de usuário não cadastrado');
+      } else {
+        res.status(404).json({ error: 'Cliente não encontrado ou sem permissão para editar.' });
       }
     })
     .catch(error => {
         console.log('ERROR:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar cliente.' });
     });
 });
 

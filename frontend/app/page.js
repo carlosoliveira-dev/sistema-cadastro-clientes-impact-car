@@ -93,16 +93,51 @@ useEffect(() => {
     setShowForm(false);
   };
 
-  const handleUpdateCustomer = (customerData) => {
-    if (editingCustomer) {
+  const handleUpdateCustomer = async (customerData) => {
+    if (!editingCustomer) return;
+    setError(null);
+    setLoading(true);
+
+    try {
+      // 1. Obtém o token JWT necessário para autenticar na rota do backend
+      const token = user?.token || localStorage.getItem('token');
+
+      // 2. Faz a chamada HTTP PUT enviando o ID do cliente na URL
+      const response = await fetch(`${API_URL}/${editingCustomer.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(customerData) // Envia name, email, phone, address
+      });
+
+      // 3. Valida se o backend processou a atualização com sucesso
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao atualizar o cliente.');
+      }
+
+      const updatedData = await response.json();
+
+      // 4. Atualiza o estado local do React substituindo o cliente antigo pelos dados novos vindos do banco
       setCustomers(prev =>
         prev.map(customer =>
-          customer.id === editingCustomer.id
-            ? { ...customerData, id: customer.id }
+          customer.id === editingCustomer.id 
+            ? { ...customer, ...customerData } 
             : customer
         )
       );
+
+      // 5. Fecha o formulário e limpa o estado de edição
       setEditingCustomer(null);
+      setShowForm(false);
+
+    } catch (err) {
+      console.error("Erro na requisição PUT:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
