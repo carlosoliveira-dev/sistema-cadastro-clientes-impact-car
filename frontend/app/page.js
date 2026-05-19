@@ -84,15 +84,39 @@ useEffect(() => {
     return <AuthPage />;
   }
 
-  const handleAddCustomer = (customerData) => {
-    const newCustomer = {
-      ...customerData,
-      id: Date.now().toString(),
-    };
-    setCustomers(prev => [newCustomer, ...prev]);
-    setShowForm(false);
-  };
+// POST: Adicionar cliente no backend
+  const handleAddCustomer = async (customerData) => {
+    setError(null);
+    try {
+      // 1. Obtém o token JWT do contexto do usuário ou do localStorage
+      const token = user?.token || localStorage.getItem('token');
 
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          // 2. Insere o token Bearer para que o backend possa extrair o user_id
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData), 
+      });
+
+      // 3. Lê o erro tratado pelo backend se a requisição falhar
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao salvar o cliente.');
+      }
+      
+      const newCustomer = await response.json();
+      
+      // Atualiza o estado local com o objeto retornado pelo banco de dados
+      setCustomers(prev => [newCustomer, ...prev]);
+      setShowForm(false);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
   const handleUpdateCustomer = async (customerData) => {
     if (!editingCustomer) return;
     setError(null);

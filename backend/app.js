@@ -49,13 +49,10 @@ app.delete('/users/:id', (req, res) => {
 
 
 
-/* autenticação do usuário */
-
 /* cria uma nova conta de usuário */
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
 
-  // 1. Validação básica de entrada
   if (!name || !email || !password) {
     return res.status(400).json({ error: "Todos os campos (name, email, password) são obrigatórios." });
   }
@@ -75,9 +72,21 @@ app.post('/signup', async (req, res) => {
       [name, email, passwordHash]
     );
 
+    const token = jwt.sign(
+      { user_id: newUser.id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '1d' }
+    );
+
     res.status(201).json({
       message: "Usuário criado com sucesso!",
-      user: newUser
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        created_at: newUser.created_at
+      },
+      token: token
     });
 
   } catch (error) {
